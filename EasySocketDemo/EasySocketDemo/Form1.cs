@@ -28,30 +28,38 @@ namespace EasySocketDemo
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            IPAddress ip = IPAddress.Any;
-            IPEndPoint point = new IPEndPoint(ip, Convert.ToInt32(txtPort.Text));
-            socketWatch.Bind(point);
-            socketWatch.Listen(10);
-            ShowMsg("监听成功");
+            try
+            {
+                IPAddress ip = IPAddress.Any;
+                IPEndPoint point = new IPEndPoint(ip, Convert.ToInt32(txtPort.Text));
+                socketWatch.Bind(point);
+                socketWatch.Listen(10);
+                ShowMsg("监听成功");
 
 
-            Thread th = new Thread(Listen);
-            th.IsBackground = false;
-            th.Start();
+                Thread th = new Thread(Listen);
+                th.IsBackground = false;
+                th.Start();
+            }
+            catch { }
         }
 
         private void Listen()
         {
             while (true)
             {
-                socketSend = socketWatch.Accept();
-                dicSocket.Add(socketSend.RemoteEndPoint.ToString(), socketSend);
-                cboUsers.Items.Add(socketSend.RemoteEndPoint.ToString());
-                ShowMsg(socketSend.RemoteEndPoint.ToString() + ":" + "连接成功");
+                try
+                {
+                    socketSend = socketWatch.Accept();
+                    dicSocket.Add(socketSend.RemoteEndPoint.ToString(), socketSend);
+                    cboUsers.Items.Add(socketSend.RemoteEndPoint.ToString());
+                    ShowMsg(socketSend.RemoteEndPoint.ToString() + ":" + "连接成功");
 
-                Thread th = new Thread(Receive);
-                th.IsBackground = true;
-                th.Start(socketSend);
+                    Thread th = new Thread(Receive);
+                    th.IsBackground = true;
+                    th.Start(socketSend);
+                }
+                catch { }
             }
         }
 
@@ -104,39 +112,51 @@ namespace EasySocketDemo
 
         private void btnSelect_Click(object sender, EventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Title = "请选择要发送的文件";
-            ofd.Filter = "文本文件|*.txt|所有文件|*.*";
-            ofd.InitialDirectory = @"C:\Users\Administrator.USER-20190915QG\Desktop";
-            ofd.Multiselect = false;
-            ofd.ShowDialog();
-            txtFile.Text = ofd.FileName;
+            try
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Title = "请选择要发送的文件";
+                ofd.Filter = "文本文件|*.txt|所有文件|*.*";
+                ofd.InitialDirectory = @"C:\Users\Administrator.USER-20190915QG\Desktop";
+                ofd.Multiselect = false;
+                ofd.ShowDialog();
+                txtFile.Text = ofd.FileName;
+            }
+            catch { }
 
         }
 
         private void btnSendFile_Click(object sender, EventArgs e)
         {
-            string path = txtFile.Text;
-            using (FileStream fsRead = new FileStream(path, FileMode.Open, FileAccess.Read))
+            try
             {
-                byte[] buffer = new byte[1024 * 1024 * 5];
-                int r = fsRead.Read(buffer, 0, buffer.Length);
-                List<byte> list = new List<byte>();
-                list.Add(1);
-                list.AddRange(buffer);
-                byte[] newBuffer = list.ToArray();
-                string ip = cboUsers.SelectedItem.ToString();
-                dicSocket[ip].Send(newBuffer, 0, r + 1, SocketFlags.None);
+                string path = txtFile.Text;
+                using (FileStream fsRead = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] buffer = new byte[1024 * 1024 * 5];
+                    int r = fsRead.Read(buffer, 0, buffer.Length);
+                    List<byte> list = new List<byte>();
+                    list.Add(1);
+                    list.AddRange(buffer);
+                    byte[] newBuffer = list.ToArray();
+                    string ip = cboUsers.SelectedItem.ToString();
+                    dicSocket[ip].Send(newBuffer, 0, r + 1, SocketFlags.None);
+                }
             }
+            catch { }
 
         }
 
         private void btnZD_Click(object sender, EventArgs e)
         {
-            byte[] buffer = new byte[1];
-            buffer[0] = 2;
-            string ip = cboUsers.SelectedItem.ToString();
-            dicSocket[ip].Send(buffer);
+            try
+            {
+                byte[] buffer = new byte[1];
+                buffer[0] = 2;
+                string ip = cboUsers.SelectedItem.ToString();
+                dicSocket[ip].Send(buffer);
+            }
+            catch { }
         }
     }
 }

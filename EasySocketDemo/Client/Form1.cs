@@ -108,10 +108,13 @@ namespace Client
 
         private void btnSendMsg_Click(object sender, EventArgs e)
         {
-            string str = txtMsg.Text.Trim();
-            byte[] buffer = Encoding.UTF8.GetBytes(str);
-            socketSend.Send(buffer);
-
+            try
+            {
+                string str = txtMsg.Text.Trim();
+                byte[] buffer = Encoding.UTF8.GetBytes(str);
+                socketSend.Send(buffer);
+            }
+            catch { }
         }
     }
 }
